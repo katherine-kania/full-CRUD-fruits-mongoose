@@ -4,7 +4,6 @@
 const express = require('express')
 const User = require('../models/user')
 const bcrypt = require('bcryptjs')
-const req = require('express/lib/request')
 
 ////////////////////////////////////////////
 // Create router
@@ -86,12 +85,13 @@ router.post('/login', async (req, res) => {
 })
 
 // logout route -> destroy the session
-router.get("/logout", (req, res) => {
-    // destroy session and redirect to main page
-    req.session.destroy((err) => {
-      res.redirect("/fruits")
+router.get('/logout', (req, res) => {
+    // destroy the session and redirect to the main page
+    req.session.destroy(err => {
+        console.log('this is err in logout', err)
+        res.send('your session has been destroyed')
     })
-  })
+})
 
 ////////////////////////////////////////////
 // Export the Router

@@ -29,10 +29,26 @@ router.use((req, res, next) => {
 // Routes
 ////////////////////////////////////////////
 
-// index route
+// index ALL fruits route
 router.get('/', (req, res) => {
 	// find the fruits
 	Fruit.find({})
+		// then render a template AFTER they're found
+		.then((fruits) => {
+			console.log(fruits)
+			res.render('fruits/index', { fruits })
+		})
+		// show an error if there is one
+		.catch((error) => {
+			console.log(error)
+			res.json({ error })
+		})
+})
+
+// index that shows only the user's fruits
+router.get('/mine', (req, res) => {
+	// find the fruits
+	Fruit.find({ username: req.session.username })
 		// then render a template AFTER they're found
 		.then((fruits) => {
 			// console.log(fruits)
@@ -59,9 +75,11 @@ router.post('/', (req, res) => {
 	req.body.readyToEat = req.body.readyToEat === 'on' ? true : false
 	// console.log('this is the fruit to create', req.body)
 	// now we're ready for mongoose to do its thing
+	// now that we have user specific fruits, we'll add the username to the fruit created
+	req.body.username = req.session.username
 	Fruit.create(req.body)
 		.then((fruit) => {
-			// console.log('this was returned from create', fruit)
+			console.log('this was returned from create', fruit)
 			res.redirect('/fruits')
 		})
 		.catch((err) => {
