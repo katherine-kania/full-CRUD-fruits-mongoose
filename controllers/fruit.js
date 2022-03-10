@@ -15,7 +15,6 @@ const router = express.Router()
 ////////////////////////////////////////////
 
 
-
 // index route
 router.get('/', (req, res) => {
     // find the fruits
