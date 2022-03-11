@@ -65,6 +65,9 @@ router.post('/login', async (req, res) => {
                     // store some properties in the session
                     req.session.username = username
                     req.session.loggedIn = true
+                    req.session.userId = user.id
+
+                    console.log('session user id', req.session.userID)
                     // redirect to /fruits if login is successful
                     res.redirect('/fruits')
                 } else {
@@ -89,7 +92,7 @@ router.get('/logout', (req, res) => {
     // destroy the session and redirect to the main page
     req.session.destroy(err => {
         console.log('this is err in logout', err)
-        res.send('your session has been destroyed')
+        res.redirect('/')
     })
 })
 

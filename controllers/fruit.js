@@ -35,8 +35,10 @@ router.get('/', (req, res) => {
 	Fruit.find({})
 		// then render a template AFTER they're found
 		.then((fruits) => {
-			console.log(fruits)
-			res.render('fruits/index', { fruits })
+			const username = req.session.username
+			const loggedIn = req.session.loggedIn
+			// console.log(fruits)
+			res.render('fruits/index', { fruits, username, loggedIn })
 		})
 		// show an error if there is one
 		.catch((error) => {
@@ -48,11 +50,14 @@ router.get('/', (req, res) => {
 // index that shows only the user's fruits
 router.get('/mine', (req, res) => {
 	// find the fruits
-	Fruit.find({ username: req.session.username })
+	Fruit.find({ owner: req.session.userId })
 		// then render a template AFTER they're found
 		.then((fruits) => {
 			// console.log(fruits)
-			res.render('fruits/index', { fruits })
+			const username = req.session.username
+			const loggedIn = req.session.loggedIn
+
+			res.render('fruits/index', { fruits, username, loggedIn })
 		})
 		// show an error if there is one
 		.catch((error) => {
@@ -63,7 +68,9 @@ router.get('/mine', (req, res) => {
 
 // new route -> GET route that renders our page with the form
 router.get('/new', (req, res) => {
-	res.render('fruits/new')
+	const username = req.session.username
+	const loggedIn = req.session.loggedIn
+	res.render('fruits/new', { username, loggedIn })
 })
 
 // create -> POST route that actually calls the db and makes a new document
@@ -76,7 +83,10 @@ router.post('/', (req, res) => {
 	// console.log('this is the fruit to create', req.body)
 	// now we're ready for mongoose to do its thing
 	// now that we have user specific fruits, we'll add the username to the fruit created
-	req.body.username = req.session.username
+	// req.body.username = req.session.username
+	// instead of a username, we're now using a reference
+	// and since we've stored the id of the user in the session object, we can use it to set the owner property of the fruit upon creation.
+	req.body.owner = req.session.userId
 	Fruit.create(req.body)
 		.then((fruit) => {
 			console.log('this was returned from create', fruit)
@@ -96,7 +106,10 @@ router.get('/:id/edit', (req, res) => {
 	Fruit.findById(fruitId)
 		// -->render if there is a fruit
 		.then((fruit) => {
-			res.render('fruits/edit', { fruit })
+			console.log('edit froot', fruit)
+			const username = req.session.username
+			const loggedIn = req.session.loggedIn
+			res.render('fruits/edit', { fruit, username, loggedIn })
 		})
 		// -->error if no fruit
 		.catch((err) => {
@@ -131,7 +144,11 @@ router.get('/:id', (req, res) => {
 	Fruit.findById(fruitId)
 		// once found, we can render a view with the data
 		.then((fruit) => {
-			res.render('fruits/show', { fruit })
+			console.log('the fruit we got\n', fruit)
+			const username = req.session.username
+			const loggedIn = req.session.loggedIn
+			const userId = req.session.userId
+			res.render('fruits/show', { fruit, username, loggedIn, userId })
 		})
 		// if there is an error, show that instead
 		.catch((err) => {
