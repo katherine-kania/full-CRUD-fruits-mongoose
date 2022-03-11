@@ -46,6 +46,38 @@ router.post('/:fruitId', (req, res) => {
 })
 
 // DELETE -> to destroy a comment
+// we'll use two params to make our life easier
+// first the id of the fruit, since we need to find it
+// then the id of the comment, since we want to delete it
+router.delete('/delete/:fruitId/:commId', (req, res) => {
+    // first we want to parse out our ids
+    const fruitId = req.params.fruitId
+    const commId = req.params.commId
+    // then we'll find the fruit
+    Fruit.findById(fruitId)
+        .then(fruit => {
+            const theComment = fruit.comments.id(commId)
+            // only delete the comment if the user who is logged in is the comment's author
+            if ( theComment.author == req.session.userId) {
+                // then we'll delete the comment
+                theComment.remove()
+                // return the saved fruit
+                return fruit.save()
+            } else {
+                return
+            }
+
+        })
+        .then(fruit => {
+            // redirect to the fruit show page
+            res.redirect(`/fruits/${fruitId}`)
+        })
+        .catch(error => {
+            // catch any errors
+            console.log(error)
+            res.send(error)
+        })
+})
 
 ////////////////////////////////////////////
 // Export the Router
